@@ -6,8 +6,13 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const busRoutes = require('./routes/busRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const cors = require('cors');
 
 require('dotenv').config();
+
+// Use CORS middleware
+app.use(cors());
+
 
 const app = express();
 const server = http.createServer(app);
