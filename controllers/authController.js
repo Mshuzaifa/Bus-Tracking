@@ -2,27 +2,30 @@ const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
+
 // Register a new user
 exports.userregister = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ success: false, message: 'Validation errors', errors: errors.array() });
   }
 
   const { name, email, password, role } = req.body;
 
   // Validate email domain with role consistency
-  if (email.endsWith('@vitapstudent.ac.in') && role !== 'student') {
-    return res.status(400).json({ error: 'Role mismatch with email domain' });
+  if (role === 'student' && !email.endsWith('@vitapstudent.ac.in')) {
+    return res.status(400).json({ success: false, message: 'Student email must end with @vitapstudent.ac.in' });
   }
 
- 
+  if (role === 'driver' && !email.endsWith('@vitapdriver.ac.in')) {
+    return res.status(400).json({ success: false, message: 'Driver email must end with @vitapdriver.ac.in' });
+  }
 
   try {
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
     // Create new user
@@ -41,16 +44,18 @@ exports.userregister = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '1h' },
       (err, token) => {
-        if (err) throw err;
-        res.status(200).json({ msg: 'User registered successfully', token });
+        if (err) {
+          console.error('Token generation error:', err.message);
+          return res.status(500).json({ success: false, message: 'Token generation failed' });
+        }
+        res.status(200).json({ success: true, message: 'User registered successfully', token });
       }
     );
   } catch (error) {
     console.error('Registration error:', error.message);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
-
 
 // Registering a Driver Separately
 exports.driverregister = async (req, res) => {
@@ -144,7 +149,7 @@ exports.login = async (req, res) => {
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.status(200).json({ token });
+        res.status(200).json({ token, role: user.role });
       }
     );
   } catch (error) {

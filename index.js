@@ -10,13 +10,13 @@ const cors = require('cors');
 
 require('dotenv').config();
 
-// Use CORS middleware
-app.use(cors());
-
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+// Use CORS middleware
+app.use(cors());
+app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
