@@ -6,6 +6,9 @@ const BusLocationSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  phoneNumber: {
+    type: String
+  },
   latitude: {
     type: Number,
     required: true,
