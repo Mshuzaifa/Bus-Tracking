@@ -38,7 +38,11 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/bus', busRoutes);
 app.use('/api/student', studentRoutes);
-
+app.get("/", (req, res) => {
+  res.status(200).json({
+    "status" : "ok"
+  })
+})
 io.on('connection', (socket) => {
   console.log('A user connected');
   socket.on('disconnect', () => {
