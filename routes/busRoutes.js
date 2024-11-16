@@ -1,5 +1,5 @@
 const express = require('express');
-const { updateLocation, getAvailableBuses, getBusLocation, updateOnlyLocation } = require('../controllers/busController');
+const { updateLocation, getAvailableBuses, getBusLocation, updateOnlyLocation, stopBus } = require('../controllers/busController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
@@ -15,5 +15,6 @@ router.post('/stop', authMiddleware, roleMiddleware('driver'), (req, res) => {
 router.post('/location/:busId', authMiddleware, roleMiddleware('driver'), updateOnlyLocation);
 router.get('/get-busses', getAvailableBuses);
 router.get('/track-bus/:busId', getBusLocation);
+router.get('/stop-bus/:busId', stopBus);
 
 module.exports = router;

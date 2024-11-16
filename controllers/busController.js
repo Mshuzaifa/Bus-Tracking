@@ -51,6 +51,12 @@ exports.updateOnlyLocation = async (req, res) => {
 exports.getBusLocation = async (req, res) => {
   const busId = req.params.busId;
   const busDetails = await BusLocation.findOne({ busId })
+
+  if(!busDetails) {
+    res.status(404).json({
+      "error" : "Bus Id Not Found"
+    })
+  }
   res.status(200).send(busDetails);
 }
 
@@ -58,3 +64,32 @@ exports.getAvailableBuses = async (req, res) => {
   const busses = await BusLocation.find();
   return res.status(200).json(busses);
 }
+
+exports.stopBus = async (req, res) => {
+  const busId = req.params.busId;
+  
+  // Find the bus details by busId
+  const busDetails = await BusLocation.findOne({ busId });
+
+  if (!busDetails) {
+    return res.status(404).json({
+      error: "Bus Id Not Found"
+    });
+  }
+
+  // Delete the bus entry based on busId
+  const result = await BusLocation.deleteOne({ busId });
+
+  // If no document was deleted, it means the busId did not exist
+  if (result.deletedCount === 0) {
+    return res.status(404).json({
+      error: "Bus Id Not Found"
+    });
+  }
+
+  // Success response
+  return res.status(200).json({
+    message: "Success: Tracking stopped"
+  });
+};
+
