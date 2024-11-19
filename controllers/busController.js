@@ -27,17 +27,20 @@ exports.updateLocation = async (req, res) => {
 exports.updateOnlyLocation = async (req, res) => {
   const { latitude, longitude } = req.body;
   const busId = req.params.busId; // Assuming busId is the driver's user ID
-
+  console.log("updateing location of : " + busId)
   try {
-    // Update the location in the database
-    let busLocation = await BusLocation.findOne({ busId });
-    if (busLocation) {
-      busLocation.latitude = latitude;
-      busLocation.longitude = longitude;
-    } else {
+    let busLocation = await BusLocation.findOneAndUpdate(
+      { busId },
+      { $set: { latitude, longitude } },
+      { new: true } // This option returns the updated document
+    );
+    
+    if (!busLocation) {
+      // If the bus location doesn't exist, create a new one
       busLocation = new BusLocation({ busId, phoneNumber, latitude, longitude });
+      await busLocation.save();
     }
-    await busLocation.save();
+    
 
     // Broadcast the new location to all connected clients (students)
     // req.io.emit('busLocationUpdate', { latitude, longitude });
